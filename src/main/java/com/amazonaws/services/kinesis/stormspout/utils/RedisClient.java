@@ -26,7 +26,8 @@ public class RedisClient {
 	
 	public void updateWordCountToRedis(String word) {
 		int count = 0;
-		if(null != jedis.get(word.trim())) {
+		word = word.trim();
+		if(null != jedis.get(word)) {
 			LOG.info("count before parsing" + jedis.get(word));
 			count = Integer.parseInt(jedis.get(word));
 			count++;
@@ -34,7 +35,7 @@ public class RedisClient {
 			count = 1;
 		}
 		LOG.info("word--->" + word + " count---->" + count);
-		jedis.set(word.trim(), String.valueOf(count));
+		jedis.set(word, String.valueOf(count));
 	}
 	
 	public static void main(String args[]) {
