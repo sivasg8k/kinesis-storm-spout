@@ -1,10 +1,13 @@
 package com.amazonaws.services.kinesis.stormspout.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 
 public class RedisClient {
 	
 	private static final String endpoint = "moviereviewsdb.sqjbuo.0001.use1.cache.amazonaws.com";
+	private static final Logger LOG = LoggerFactory.getLogger(RedisClient.class);
 	
 	private static RedisClient redisClient = new RedisClient();
 	
@@ -24,11 +27,13 @@ public class RedisClient {
 	public void updateWordCountToRedis(String word) {
 		Integer count = null;
 		if(null != jedis.get(word)) {
+			LOG.info("count before parsing" + jedis.get(word));
 			count = Integer.parseInt(jedis.get(word));
 			count++;
 		} else {
 			count = new Integer(1);
 		}
+		LOG.info("word--->" + word + " count---->" + count);
 		jedis.set(word.trim(), String.valueOf(count));
 	}
 	
