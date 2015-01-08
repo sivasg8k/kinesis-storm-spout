@@ -42,7 +42,7 @@ public class BigDataUtil {
 	}
 	
 	public static void main(String args[]) {
-		System.out.println("siva%$^".replace("%$^",""));
+		System.out.println("siva%$\"^".replace("%$^",""));
 	}
 	
 	
@@ -54,7 +54,10 @@ public class BigDataUtil {
 		
 		while(st.hasMoreTokens()) {
 			String token = st.nextToken().trim();
-			token = token.replace("\"/:,.","");
+			token = token.replace("\"","");
+			token = token.replace("/","");
+			token = token.replace(":","");
+			token = token.replace(",","");
 			if(null == stopWords.get(token.toLowerCase())) {
 				output.append(token);
 				output.append(" ");
