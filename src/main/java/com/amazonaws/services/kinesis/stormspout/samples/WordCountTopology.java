@@ -12,7 +12,7 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package com.amazonaws.services.kinesis.stormspout;
+package com.amazonaws.services.kinesis.stormspout.samples;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -36,9 +36,9 @@ import com.amazonaws.services.kinesis.stormspout.InitialPositionInStream;
 import com.amazonaws.services.kinesis.stormspout.KinesisSpout;
 import com.amazonaws.services.kinesis.stormspout.KinesisSpoutConfig;
 
-public class SampleTopology {
-    private static final Logger LOG = LoggerFactory.getLogger(SampleTopology.class);
-    private static String topologyName = "SampleTopology";
+public class WordCountTopology {
+    private static final Logger LOG = LoggerFactory.getLogger(WordCountTopology.class);
+    private static String topologyName = "WordCountTopology";
     private static String streamName;
     private static InitialPositionInStream initialPositionInStream = InitialPositionInStream.LATEST;
     private static int recordRetryLimit = 3;
@@ -72,7 +72,8 @@ public class SampleTopology {
 
         // Using number of shards as the parallelism hint for the spout.
         builder.setSpout("kinesis_spout", spout, 2);
-        builder.setBolt("print_bolt", new SampleBolt(), 2).fieldsGrouping("kinesis_spout", new Fields(SampleKinesisRecordScheme.FIELD_PARTITION_KEY));
+        builder.setBolt("split_bolt", new WordSplitBolt(), 3).fieldsGrouping("kinesis_spout", new Fields(SampleKinesisRecordScheme.FIELD_PARTITION_KEY));
+        builder.setBolt("wordcount_bolt", new WordCountBolt(),5).fieldsGrouping("split_bolt", new Fields("word"));
 
         Config topoConf = new Config();
         topoConf.setFallBackOnJavaSerialization(true);
@@ -146,7 +147,7 @@ public class SampleTopology {
     }
     
     private static void printUsageAndExit() {
-        System.out.println("Usage: " + SampleTopology.class.getName() + " <propertiesFile> <LocalMode or RemoteMode>");
+        System.out.println("Usage: " + WordCountTopology.class.getName() + " <propertiesFile> <LocalMode or RemoteMode>");
         System.exit(-1);
     }
 

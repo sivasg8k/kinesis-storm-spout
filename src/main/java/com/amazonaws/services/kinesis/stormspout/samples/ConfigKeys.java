@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-package com.amazonaws.services.kinesis.stormspout;
+package com.amazonaws.services.kinesis.stormspout.samples;
 
 /**
  * Keys for configuration of overrides (via properties file).

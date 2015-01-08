@@ -60,6 +60,11 @@
             <artifactId>curator-framework</artifactId>
             <version>${curator-framework.version}</version>
         </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>2.4.2</version>
+        </dependency>
     </dependencies>
 
     <developers>

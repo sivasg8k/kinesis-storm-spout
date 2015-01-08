@@ -12,28 +12,37 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package com.amazonaws.services.kinesis.stormspout;
+package com.amazonaws.services.kinesis.stormspout.samples;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.amazonaws.services.kinesis.stormspout.utils.BigDataUtil;
+
+
+import com.amazonaws.services.kinesis.stormspout.utils.RedisClient;
 
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseBasicBolt;
+import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
 
-import com.amazonaws.services.kinesis.model.Record;
 
-public class SampleBolt extends BaseBasicBolt {
+
+
+public class WordSplitBolt extends BaseBasicBolt {
     private static final long serialVersionUID = 177788290277634253L;
-    private static final Logger LOG = LoggerFactory.getLogger(SampleBolt.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WordSplitBolt.class);
     private transient CharsetDecoder decoder;
 
     @Override
@@ -55,10 +64,23 @@ public class SampleBolt extends BaseBasicBolt {
         }
         LOG.info("SampleBolt got record: partitionKey=" + partitionKey + ", " + " sequenceNumber=" + sequenceNumber
                 + ", data=" + data);
+        data = data.replace("review/summary", "");
+        data = data.replace("review/text", "");
+        data = BigDataUtil.getInstance().removeStopWords(data);
+        LOG.info("Stop words removed for record seq number " + sequenceNumber);
+       // RedisClient.getInstance().updateWordCountToRedis(data);
+        
+    	StringTokenizer st = new StringTokenizer(data," ");
+		while(st.hasMoreTokens()) {
+			String word = st.nextToken();
+			collector.emit(new Values(word));
+		}
+        
     }
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
+    	declarer.declare(new Fields("word"));
     }
 
 }
