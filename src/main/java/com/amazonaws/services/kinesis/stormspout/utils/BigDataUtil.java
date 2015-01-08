@@ -41,6 +41,10 @@ public class BigDataUtil {
 		return bigDataUtil;
 	}
 	
+	public static void main(String args[]) {
+		System.out.println("siva%$^".replace("%$^",""));
+	}
+	
 	
 	public String removeStopWords(String input) {
 		
@@ -50,11 +54,8 @@ public class BigDataUtil {
 		
 		while(st.hasMoreTokens()) {
 			String token = st.nextToken().trim();
-			if(null == stopWords.get(token)) {
-				token = token.replace("/", "");
-				token = token.replace(":", "");
-				token = token.replace(",", "");
-				token = token.replace(".", "");
+			token = token.replace("\"/:,.","");
+			if(null == stopWords.get(token.toLowerCase())) {
 				output.append(token);
 				output.append(" ");
 			}

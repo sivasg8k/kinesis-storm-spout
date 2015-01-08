@@ -33,9 +33,10 @@ public class RedisClient {
 			if(null != jedis.get(word)) {
 				LOG.info("count before parsing the word " + word + " is " + jedis.get(word));
 				try {
-					count = Integer.parseInt(jedis.get(word));
-				} catch(NumberFormatException nfe) { 
+					count = new Integer(jedis.get(word));
+				} catch(Exception nfe) { 
 					jedis.del(word);
+					return;
 				}
 				
 				count++;
