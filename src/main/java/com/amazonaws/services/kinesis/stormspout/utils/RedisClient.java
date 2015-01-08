@@ -29,7 +29,7 @@ public class RedisClient {
 		} else {
 			count = new Integer(1);
 		}
-		jedis.set(word, String.valueOf(count));
+		jedis.set(word.trim(), String.valueOf(count));
 	}
 	
 	public static void main(String args[]) {
