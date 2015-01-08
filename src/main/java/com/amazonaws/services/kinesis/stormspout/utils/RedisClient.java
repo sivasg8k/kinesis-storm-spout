@@ -25,17 +25,21 @@ public class RedisClient {
 	}
 	
 	public void updateWordCountToRedis(String word) {
+		
 		int count = 0;
-		word = word.trim();
-		if(null != jedis.get(word)) {
-			LOG.info("count before parsing" + jedis.get(word));
-			count = Integer.parseInt(jedis.get(word));
-			count++;
-		} else {
-			count = 1;
+		
+		if(null != word && !"".equalsIgnoreCase(word)) {
+			word = word.trim();
+			if(null != jedis.get(word)) {
+				LOG.info("count before parsing" + jedis.get(word));
+				count = Integer.parseInt(jedis.get(word));
+				count++;
+			} else {
+				count = 1;
+			}
+			LOG.info("word--->" + word + " count---->" + count);
+			jedis.set(word, String.valueOf(count));
 		}
-		LOG.info("word--->" + word + " count---->" + count);
-		jedis.set(word, String.valueOf(count));
 	}
 	
 	public static void main(String args[]) {

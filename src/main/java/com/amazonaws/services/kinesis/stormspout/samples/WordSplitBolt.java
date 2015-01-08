@@ -62,8 +62,8 @@ public class WordSplitBolt extends BaseBasicBolt {
         } catch (CharacterCodingException e) {
             LOG.error("Exception when decoding record ", e);
         }
-        LOG.info("SampleBolt got record: partitionKey=" + partitionKey + ", " + " sequenceNumber=" + sequenceNumber
-                + ", data=" + data);
+        /*LOG.info("SampleBolt got record: partitionKey=" + partitionKey + ", " + " sequenceNumber=" + sequenceNumber
+                + ", data=" + data);*/
         data = data.replace("review/summary", "");
         data = data.replace("review/text", "");
         data = BigDataUtil.getInstance().removeStopWords(data);
