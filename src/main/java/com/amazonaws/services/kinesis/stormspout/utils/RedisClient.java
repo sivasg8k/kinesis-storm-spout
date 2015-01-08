@@ -26,16 +26,21 @@ public class RedisClient {
 	
 	public void updateWordCountToRedis(String word) {
 		
-		int count = 0;
+		Integer count = null;
 		
 		if(null != word && !"".equalsIgnoreCase(word)) {
 			word = word.trim();
 			if(null != jedis.get(word)) {
 				LOG.info("count before parsing the word " + word + " is " + jedis.get(word));
-				count = Integer.parseInt(jedis.get(word));
+				try {
+					count = Integer.parseInt(jedis.get(word));
+				} catch(NumberFormatException nfe) { 
+					jedis.del(word);
+				}
+				
 				count++;
 			} else {
-				count = 1;
+				count = new Integer(1);
 			}
 			LOG.info("word--->" + word + " count---->" + count);
 			jedis.set(word, String.valueOf(count));
