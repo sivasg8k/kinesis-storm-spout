@@ -13,11 +13,12 @@ public class WordCountBolt extends BaseBasicBolt {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	String set = "movieReviews";
 
 	@Override
 	public void execute(Tuple input, BasicOutputCollector collector) {
 		String word = input.getString(0);
-		RedisClient.getInstance().updateWordCountToRedis(word);
+		RedisClient.getInstance().updateWordCountToRedis(set,word);
 	}
 
 	@Override

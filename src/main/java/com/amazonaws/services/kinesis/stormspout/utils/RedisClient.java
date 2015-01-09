@@ -24,32 +24,25 @@ public class RedisClient {
 		return redisClient;
 	}
 	
-	public void updateWordCountToRedis(String word) {
+	public void updateWordCountToRedis(String set,String word) {
 		
-		Integer count = null;
+		Double count = null;
 		
 		if(null != word && !"".equalsIgnoreCase(word)) {
 			word = word.trim();
-			LOG.info("count before parsing the word " + word + " is " + jedis.get(word));
-			if(null != jedis.get(word)) {
-				try {
-					
-					count = new Integer(jedis.get(word));
-				} catch(Exception nfe) { 
-					//jedis.del(word);
-					return;
-				}
-				
+			count = getScore(set, word);
+			LOG.info("count before parsing the word " + word + " is " + count);
+			if(null != count) {
 				count++;
 			} else {
-				count = new Integer(1);
+				count = new Double(1);
 			}
 			LOG.info("word--->" + word + " count---->" + count);
-			jedis.set(word, String.valueOf(count));
+			jedis.zadd(set,count.doubleValue(),word);
 		}
 	}
 	
-	public Double getScore(String setName,String key) {
+	private Double getScore(String setName,String key) {
 		return jedis.zscore(setName, key);
 	}
 	
