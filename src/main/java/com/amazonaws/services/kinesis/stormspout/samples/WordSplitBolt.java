@@ -21,6 +21,8 @@ import java.nio.charset.CharsetDecoder;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +68,7 @@ public class WordSplitBolt extends BaseBasicBolt {
                 + ", data=" + data);*/
         data = data.replace("review/summary", "");
         data = data.replace("review/text", "");
+        data =  Jsoup.parse(data).text();
         data = BigDataUtil.getInstance().removeStopWords(data);
         LOG.info("Stop words removed for record seq number " + sequenceNumber);
        // RedisClient.getInstance().updateWordCountToRedis(data);
