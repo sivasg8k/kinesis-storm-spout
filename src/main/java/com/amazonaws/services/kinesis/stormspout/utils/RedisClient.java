@@ -33,6 +33,7 @@ public class RedisClient {
 			LOG.info("count before parsing the word " + word + " is " + jedis.get(word));
 			if(null != jedis.get(word)) {
 				try {
+					
 					count = new Integer(jedis.get(word));
 				} catch(Exception nfe) { 
 					//jedis.del(word);
@@ -48,8 +49,13 @@ public class RedisClient {
 		}
 	}
 	
+	public Double getScore(String setName,String key) {
+		return jedis.zscore(setName, key);
+	}
+	
 	public static void main(String args[]) {
 		RedisClient rd = new RedisClient();
+		System.out.println(rd.getScore("8kmiles", "Siva"));
 	}
 
 }
