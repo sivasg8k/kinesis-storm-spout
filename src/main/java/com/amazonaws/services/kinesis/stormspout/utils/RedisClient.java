@@ -30,12 +30,12 @@ public class RedisClient {
 		
 		if(null != word && !"".equalsIgnoreCase(word)) {
 			word = word.trim();
+			LOG.info("count before parsing the word " + word + " is " + jedis.get(word));
 			if(null != jedis.get(word)) {
-				LOG.info("count before parsing the word " + word + " is " + jedis.get(word));
 				try {
 					count = new Integer(jedis.get(word));
 				} catch(Exception nfe) { 
-					jedis.del(word);
+					//jedis.del(word);
 					return;
 				}
 				
