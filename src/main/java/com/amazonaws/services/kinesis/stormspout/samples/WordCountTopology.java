@@ -73,7 +73,7 @@ public class WordCountTopology {
         // Using number of shards as the parallelism hint for the spout.
         builder.setSpout("kinesis_spout", spout, 2);
         builder.setBolt("split_bolt", new WordSplitBolt(), 3).fieldsGrouping("kinesis_spout", new Fields(SampleKinesisRecordScheme.FIELD_PARTITION_KEY));
-        builder.setBolt("wordcount_bolt", new WordCountBolt(),5).fieldsGrouping("split_bolt", new Fields("word"));
+        builder.setBolt("wordcount_bolt", new WordCountBolt(),1).fieldsGrouping("split_bolt", new Fields("word"));
 
         Config topoConf = new Config();
         topoConf.setFallBackOnJavaSerialization(true);
