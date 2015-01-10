@@ -1,4 +1,4 @@
-package com.amazonaws.services.kinesis.stormspout.samples;
+package com.amazonaws.services.kinesis.stormspout.wordcount;
 
 import com.amazonaws.services.kinesis.stormspout.utils.RedisClient;
 

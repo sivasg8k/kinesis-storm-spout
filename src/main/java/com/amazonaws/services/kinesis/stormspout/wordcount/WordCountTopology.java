@@ -12,7 +12,7 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package com.amazonaws.services.kinesis.stormspout.samples;
+package com.amazonaws.services.kinesis.stormspout.wordcount;
 
 import java.io.FileInputStream;
 import java.io.IOException;
