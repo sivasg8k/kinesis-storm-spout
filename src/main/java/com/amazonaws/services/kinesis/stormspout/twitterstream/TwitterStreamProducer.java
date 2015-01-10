@@ -33,7 +33,7 @@ public class TwitterStreamProducer {
 		AmazonKinesis kinesisClient = new AmazonKinesisClient(new CustomCredentialsProviderChain());
 		setupHosebirdClient();
 		hosebirdClient.connect();
-
+		System.out.println("connected to twitter hose");
 		while (!hosebirdClient.isDone()) {
 			try {
 				String tweetText = msgQueue.take();
