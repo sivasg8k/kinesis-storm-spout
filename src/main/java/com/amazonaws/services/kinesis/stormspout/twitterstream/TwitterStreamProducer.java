@@ -37,7 +37,7 @@ public class TwitterStreamProducer {
 		while (!hosebirdClient.isDone()) {
 			try {
 				String tweetText = msgQueue.take();
-
+				System.out.println("tweet ----->" + tweetText);
 				// Add Data to a Stream
 				PutRecordRequest putRecordRequest = new PutRecordRequest();
 				putRecordRequest.setStreamName(streamName);
