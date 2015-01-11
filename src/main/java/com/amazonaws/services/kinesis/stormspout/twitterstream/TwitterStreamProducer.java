@@ -47,7 +47,7 @@ public class TwitterStreamProducer {
 	    // Create a new BasicClient. By default gzip is enabled.
 	    BasicClient client = new ClientBuilder()
 	            .name("sampleExampleClient")
-	            .hosts(Constants.STREAM_HOST)
+	            .hosts("https://api.twitter.com/1.1/")
 	            .endpoint(endpoint)
 	            .authentication(auth)
 	            .processor(new StringDelimitedProcessor(queue))
@@ -77,17 +77,17 @@ public class TwitterStreamProducer {
 	    System.out.printf("The client read %d messages!\n", client.getStatsTracker().getNumMessages());
 	  }
 	
-	/*public static void main(String args[]) throws InterruptedException {
+	public static void main(String args[]) throws InterruptedException {
 		
 		String consumerKey = System.getenv("CONSUMER_KEY");
 		String consumerSecret = System.getenv("CONSUMER_SECRET");
 		String accessToken = System.getenv("ACCESS_TOKEN");
 		String accessTokenSecret = System.getenv("ACCESS_TOKEN_SECRET");
 		
-		TwitterStreamProducer.run("X6DIcXH4RLvrPLNwGNGSZQ", "OzEZGpn6q5HkLd88oGB7pjiBNj5xRME6xBg81g9BWY", "202944837-7ak79XNZad55iGaA2nWzTar7o3fwfIOzLFOnJKPm", "2NveTKSucxSXvlrvA4nJ2WJu2lZ5xHUG8Ob2f5nwQb3jP");
-	}*/
+		TwitterStreamProducer.run(consumerKey,consumerSecret,accessToken,accessTokenSecret);
+	}
 
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		AmazonKinesis kinesisClient = new AmazonKinesisClient(new CustomCredentialsProviderChain());
 		setupHosebirdClient();
 		hosebirdClient.connect();
@@ -110,12 +110,11 @@ public class TwitterStreamProducer {
 				e.printStackTrace();
 			}
 		}
-		
-	}
+	}*/
 
 	public static void setupHosebirdClient() {
         /** Declare the host you want to connect to, the endpoint, and authentication (basic auth or oauth) */
-		Hosts hosebirdHosts = new HttpHosts(Constants.STREAM_HOST);
+		Hosts hosebirdHosts = new HttpHosts("https://api.twitter.com");
 		StatusesFilterEndpoint endpoint = new StatusesFilterEndpoint();
 
         // Optional: set up some followings and track terms
