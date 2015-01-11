@@ -6,6 +6,12 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import twitter4j.Status;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.conf.ConfigurationBuilder;
+
 import com.amazonaws.services.kinesis.AmazonKinesis;
 import com.amazonaws.services.kinesis.AmazonKinesisClient;
 import com.amazonaws.services.kinesis.model.PutRecordRequest;
@@ -40,6 +46,7 @@ public class TwitterStreamProducer {
 	    // and stall warnings are on.
 	    StatusesSampleEndpoint endpoint = new StatusesSampleEndpoint();
 	    endpoint.stallWarnings(false);
+	    
 
 	    Authentication auth = new OAuth1(consumerKey, consumerSecret, token, secret);
 	    //Authentication auth = new com.twitter.hbc.httpclient.auth.BasicAuth(username, password);
@@ -47,7 +54,7 @@ public class TwitterStreamProducer {
 	    // Create a new BasicClient. By default gzip is enabled.
 	    BasicClient client = new ClientBuilder()
 	            .name("sampleExampleClient")
-	            .hosts("https://api.twitter.com/1.1/")
+	            .hosts("https://stream.twitter.com")
 	            .endpoint(endpoint)
 	            .authentication(auth)
 	            .processor(new StringDelimitedProcessor(queue))
@@ -84,7 +91,30 @@ public class TwitterStreamProducer {
 		String accessToken = System.getenv("ACCESS_TOKEN");
 		String accessTokenSecret = System.getenv("ACCESS_TOKEN_SECRET");
 		
-		TwitterStreamProducer.run(consumerKey,consumerSecret,accessToken,accessTokenSecret);
+		ConfigurationBuilder cb = new ConfigurationBuilder();
+		cb.setDebugEnabled(true)
+		  .setOAuthConsumerKey(consumerKey)
+		  .setOAuthConsumerSecret(consumerSecret)
+		  .setOAuthAccessToken(accessToken)
+		  .setOAuthAccessTokenSecret(accessTokenSecret)
+		  .setHttpConnectionTimeout(100000);
+		TwitterFactory tf = new TwitterFactory(cb.build());
+		
+		Twitter twitter = tf.getInstance();
+		
+	    try {
+	    	List<Status> statuses = twitter.getHomeTimeline();
+	        System.out.println("Showing home timeline.");
+	        for (Status status : statuses) {
+	            System.out.println(status.getUser().getName() + ":" + status.getText());
+	        }
+		} catch (TwitterException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		/*
+		TwitterStreamProducer.run("X6DIcXH4RLvrPLNwGNGSZQ", "OzEZGpn6q5HkLd88oGB7pjiBNj5xRME6xBg81g9BWY", "202944837-7ak79XNZad55iGaA2nWzTar7o3fwfIOzLFOnJKPm", "2NveTKSucxSXvlrvA4nJ2WJu2lZ5xHUG8Ob2f5nwQb3jP");*/
 	}
 
 	/*public static void main(String[] args) {
