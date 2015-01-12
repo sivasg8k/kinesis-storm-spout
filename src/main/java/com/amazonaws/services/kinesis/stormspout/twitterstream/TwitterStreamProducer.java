@@ -1,11 +1,18 @@
 package com.amazonaws.services.kinesis.stormspout.twitterstream;
 
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import twitter4j.Query;
+import twitter4j.QueryResult;
 import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
@@ -20,7 +27,6 @@ import com.amazonaws.services.kinesis.stormspout.wordcount.CustomCredentialsProv
 import com.google.common.collect.Lists;
 import com.twitter.hbc.ClientBuilder;
 import com.twitter.hbc.core.Client;
-import com.twitter.hbc.core.Constants;
 import com.twitter.hbc.core.Hosts;
 import com.twitter.hbc.core.HttpHosts;
 import com.twitter.hbc.core.endpoint.StatusesFilterEndpoint;
@@ -34,6 +40,8 @@ public class TwitterStreamProducer {
 
 	static Client hosebirdClient;
 	static String streamName = "TwitterStreamingApp";
+	private static final Logger LOG = LoggerFactory.getLogger(TwitterStreamProducer.class);
+	private static final Long TWEET_MAP_RESET_LIMIT = 1000000L;
 
 	/** Set up your blocking queues: Be sure to size these properly based on expected TPS of your stream */
 	static BlockingQueue<String> msgQueue = new LinkedBlockingQueue<String>(100000);
@@ -47,6 +55,7 @@ public class TwitterStreamProducer {
 	    StatusesSampleEndpoint endpoint = new StatusesSampleEndpoint();
 	    endpoint.stallWarnings(false);
 	    
+	    
 
 	    Authentication auth = new OAuth1(consumerKey, consumerSecret, token, secret);
 	    //Authentication auth = new com.twitter.hbc.httpclient.auth.BasicAuth(username, password);
@@ -58,6 +67,7 @@ public class TwitterStreamProducer {
 	            .endpoint(endpoint)
 	            .authentication(auth)
 	            .processor(new StringDelimitedProcessor(queue))
+	            .socketTimeout(100000)
 	            .build();
 
 	    // Establish a connection
@@ -70,7 +80,7 @@ public class TwitterStreamProducer {
 	        break;
 	      }
 
-	      String msg = queue.poll(5, TimeUnit.SECONDS);
+	      String msg = queue.poll(100, TimeUnit.SECONDS);
 	      if (msg == null) {
 	        System.out.println("Did not receive a message in 5 seconds");
 	      } else {
@@ -86,6 +96,8 @@ public class TwitterStreamProducer {
 	
 	public static void main(String args[]) throws InterruptedException {
 		
+		AmazonKinesis kinesisClient = new AmazonKinesisClient(new CustomCredentialsProviderChain());
+		
 		String consumerKey = System.getenv("CONSUMER_KEY");
 		String consumerSecret = System.getenv("CONSUMER_SECRET");
 		String accessToken = System.getenv("ACCESS_TOKEN");
@@ -99,22 +111,45 @@ public class TwitterStreamProducer {
 		  .setOAuthAccessTokenSecret(accessTokenSecret)
 		  .setHttpConnectionTimeout(100000);
 		TwitterFactory tf = new TwitterFactory(cb.build());
-		
 		Twitter twitter = tf.getInstance();
 		
-	    try {
-	    	List<Status> statuses = twitter.getHomeTimeline();
-	        System.out.println("Showing home timeline.");
-	        for (Status status : statuses) {
-	            System.out.println(status.getUser().getName() + ":" + status.getText());
-	        }
+		Map<Long,String> tweetIdMap = new HashMap<>();
+		Long tweetCount = 0L;
+		try {
+		    	while(true) {
+			    	Query query = new Query(args[0]);
+			    	query.setLang("en");
+			    	
+			    	QueryResult queryResult = twitter.search(query);
+			    	List<Status> statuses = queryResult.getTweets();
+			    	
+			    	LOG.info("Tweet sequence starts");
+			        for (Status status : statuses) {
+			        	if(null == tweetIdMap.get(status.getId())) {
+			        		String tweetText = status.getId() + ":" +  status.getText();
+			        		
+			        		
+			        		PutRecordRequest putRecordRequest = new PutRecordRequest();
+			        		putRecordRequest.setStreamName(streamName);
+			        		putRecordRequest.setData(ByteBuffer.wrap(tweetText.getBytes()));
+			        		putRecordRequest.setPartitionKey(String.format("partitionKey-%s", "tweets"));
+			        		PutRecordResult putRecordResult = kinesisClient.putRecord(putRecordRequest);
+			        		
+			        		LOG.info(String.format("Seq No: %s - %s", putRecordResult.getSequenceNumber(), tweetText));
+				            tweetIdMap.put(status.getId(), "1");
+				            tweetCount++;
+			        	}
+			        }
+			        
+			        Thread.sleep(5000);
+			        if(tweetCount == TWEET_MAP_RESET_LIMIT) {
+			        	tweetIdMap.clear();
+			        	tweetCount=0L;
+			        }
+		    	}
 		} catch (TwitterException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		/*
-		TwitterStreamProducer.run("X6DIcXH4RLvrPLNwGNGSZQ", "OzEZGpn6q5HkLd88oGB7pjiBNj5xRME6xBg81g9BWY", "202944837-7ak79XNZad55iGaA2nWzTar7o3fwfIOzLFOnJKPm", "2NveTKSucxSXvlrvA4nJ2WJu2lZ5xHUG8Ob2f5nwQb3jP");*/
 	}
 
 	/*public static void main(String[] args) {

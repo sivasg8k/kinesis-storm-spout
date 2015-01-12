@@ -4,9 +4,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.TreeSet;
 
 import com.amazonaws.auth.AWSCredentials;
 
@@ -18,6 +22,8 @@ public class BigDataUtil {
 	
 	private static final BigDataUtil bigDataUtil = new BigDataUtil();
 	private static Map<String,String> stopWords = new HashMap<String,String>();
+	private static Set<String> positiveWords = new TreeSet<>();
+	private static Set<String> negativeWords = new TreeSet<>();
 	
 	static {
 		
@@ -32,6 +38,28 @@ public class BigDataUtil {
 			while((line = in.readLine()) != null) {
 				stopWords.put(line.trim(), "1");
 			}
+			
+			resourceName = "positive_words.txt";
+		    loader = Thread.currentThread().getContextClassLoader();
+			
+			resourceStream = loader.getResourceAsStream(resourceName);
+		    in = new BufferedReader(new InputStreamReader(resourceStream));
+		    
+		    while((line = in.readLine()) != null) {
+		    	positiveWords.add(line.trim());
+			}
+		    
+		    resourceName = "negative_words.txt";
+		    loader = Thread.currentThread().getContextClassLoader();
+			
+			resourceStream = loader.getResourceAsStream(resourceName);
+		    in = new BufferedReader(new InputStreamReader(resourceStream));
+		    
+		    while((line = in.readLine()) != null) {
+		    	negativeWords.add(line.trim());
+			}
+		    
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -39,6 +67,14 @@ public class BigDataUtil {
 	
 	public static BigDataUtil getInstance() {
 		return bigDataUtil;
+	}
+	
+	public Set<String> getPositiveWords() {
+		return positiveWords;
+	}
+	
+	public Set<String> getNegativeWords() {
+		return negativeWords;
 	}
 	
 	public static void main(String args[]) {
