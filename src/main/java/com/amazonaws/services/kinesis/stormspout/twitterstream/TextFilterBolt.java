@@ -1,8 +1,17 @@
 package com.amazonaws.services.kinesis.stormspout.twitterstream;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.amazonaws.services.kinesis.stormspout.wordcount.SampleKinesisRecordScheme;
+
+import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseBasicBolt;
@@ -14,13 +23,29 @@ public class TextFilterBolt extends BaseBasicBolt {
 	
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOG = LoggerFactory.getLogger(TextFilterBolt.class);
+	private transient CharsetDecoder decoder;
+	
+	@Override
+    public void prepare(Map stormConf, TopologyContext context) {
+        decoder = Charset.forName("UTF-8").newDecoder();
+    }
 
 	@Override
 	public void execute(Tuple input, BasicOutputCollector collector) {
 		LOG.debug("removing ugly characters");
-        String text = input.getString(0);
-        LOG.info("tweet text string------>" + text);
-        String tweetData[] = text.split(":");
+		
+		String sequenceNumber = (String)input.getValueByField(SampleKinesisRecordScheme.FIELD_SEQUENCE_NUMBER);
+        byte[] payload = (byte[])input.getValueByField(SampleKinesisRecordScheme.FIELD_RECORD_DATA);
+        ByteBuffer buffer = ByteBuffer.wrap(payload);
+        String data = null; 
+        try {
+            data = decoder.decode(buffer).toString();
+        } catch (CharacterCodingException e) {
+            LOG.error("Exception when decoding record ", e);
+        }
+		
+		LOG.info("sequence number ----->" + sequenceNumber + " tweet text string------>" + data);
+        String tweetData[] = data.split(":");
         Long tweetId = new Long(tweetData[0]);
         String tweetText = tweetData[1];
         tweetText = tweetText.replaceAll("[^a-zA-Z\\s]", "").trim().toLowerCase();

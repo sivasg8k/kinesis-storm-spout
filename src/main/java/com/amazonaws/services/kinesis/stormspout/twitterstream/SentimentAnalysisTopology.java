@@ -19,7 +19,6 @@ import com.amazonaws.services.kinesis.stormspout.wordcount.WordCountTopology;
 
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
-import backtype.storm.StormSubmitter;
 import backtype.storm.generated.StormTopology;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
@@ -159,6 +158,8 @@ public class SentimentAnalysisTopology {
 			conf.setMaxTaskParallelism(workers);
 		else
 			conf.setNumWorkers(workers);
+		conf.setFallBackOnJavaSerialization(true);
+        
 		return conf;
 	}
 
