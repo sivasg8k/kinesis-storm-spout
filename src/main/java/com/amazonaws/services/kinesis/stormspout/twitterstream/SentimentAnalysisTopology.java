@@ -129,8 +129,9 @@ public class SentimentAnalysisTopology {
         // Using number of shards as the parallelism hint for the spout.
         topology.setSpout("kinesis_spout", spout, 1);
 
-		topology.setBolt("text_filter", new TextFilterBolt(), 2)
-				.shuffleGrouping("kinesis_spout");
+		topology.setBolt("text_filter", new TextFilterBolt(), 2).fieldsGrouping("kinesis_spout", new Fields(SampleKinesisRecordScheme.FIELD_PARTITION_KEY));
+				//.shuffleGrouping("kinesis_spout");
+		
 
 		/*topology.setBolt("stemming", new StemmingBolt(), 2).shuffleGrouping(
 				"text_filter");

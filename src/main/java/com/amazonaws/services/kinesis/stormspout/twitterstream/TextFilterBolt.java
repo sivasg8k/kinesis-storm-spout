@@ -19,6 +19,7 @@ public class TextFilterBolt extends BaseBasicBolt {
 	public void execute(Tuple input, BasicOutputCollector collector) {
 		LOG.debug("removing ugly characters");
         String text = input.getString(0);
+        LOG.info("tweet text string------>" + text);
         String tweetData[] = text.split(":");
         Long tweetId = new Long(tweetData[0]);
         String tweetText = tweetData[1];
