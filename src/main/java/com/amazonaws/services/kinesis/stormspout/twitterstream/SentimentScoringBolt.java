@@ -16,7 +16,7 @@ public class SentimentScoringBolt extends BaseBasicBolt {
 
     public void execute(Tuple tuple, BasicOutputCollector collector) {
     	
-        LOGGER.debug("Scoring tweet");
+        LOGGER.info("Scoring tweet");
         Long id = tuple.getLong(tuple.fieldIndex("tweet_id"));
         String text = tuple.getString(tuple.fieldIndex("tweet_text"));
         Float pos = tuple.getFloat(tuple.fieldIndex("pos_score"));

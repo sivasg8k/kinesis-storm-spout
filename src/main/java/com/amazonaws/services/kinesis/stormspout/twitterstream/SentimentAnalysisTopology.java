@@ -132,7 +132,7 @@ public class SentimentAnalysisTopology {
 				//.shuffleGrouping("kinesis_spout");
 		
 
-		/*topology.setBolt("stemming", new StemmingBolt(), 2).shuffleGrouping(
+		topology.setBolt("stemming", new StemmingBolt(), 2).shuffleGrouping(
 				"text_filter");
 
 		topology.setBolt("positive", new PositiveSentimentBolt(), 2)
@@ -145,7 +145,7 @@ public class SentimentAnalysisTopology {
 				.fieldsGrouping("negative", new Fields("tweet_id"));
 
 		topology.setBolt("score", new SentimentScoringBolt(), 2)
-				.shuffleGrouping("join");*/
+				.shuffleGrouping("join");
 
 		return topology.createTopology();
 	}
@@ -153,7 +153,7 @@ public class SentimentAnalysisTopology {
 	private static Config createConfig(boolean local) {
 		int workers = 1;
 		Config conf = new Config();
-		conf.setDebug(true);
+		conf.setDebug(false);
 		if (local)
 			conf.setMaxTaskParallelism(workers);
 		else

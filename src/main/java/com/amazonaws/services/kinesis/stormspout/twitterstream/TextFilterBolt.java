@@ -44,8 +44,7 @@ public class TextFilterBolt extends BaseBasicBolt {
             LOG.error("Exception when decoding record ", e);
         }
 		
-		LOG.info("sequence number ----->" + sequenceNumber + " tweet text string------>" + data);
-        String tweetData[] = data.split(":");
+		String tweetData[] = data.split(":");
         Long tweetId = new Long(tweetData[0]);
         String tweetText = tweetData[1];
         tweetText = tweetText.replaceAll("[^a-zA-Z\\s]", "").trim().toLowerCase();
