@@ -115,6 +115,7 @@ public class TwitterStreamProducer {
 		
 		Map<Long,String> tweetIdMap = new HashMap<>();
 		Long tweetCount = 0L;
+		Long lineNumber = 0L;
 		try {
 		    	while(true) {
 			    	Query query = new Query(args[0]);
@@ -132,12 +133,13 @@ public class TwitterStreamProducer {
 			        		PutRecordRequest putRecordRequest = new PutRecordRequest();
 			        		putRecordRequest.setStreamName(streamName);
 			        		putRecordRequest.setData(ByteBuffer.wrap(tweetText.getBytes()));
-			        		putRecordRequest.setPartitionKey(String.format("partitionKey-%s", "tweets"));
+			        		putRecordRequest.setPartitionKey(String.format("partitionKey-%d", lineNumber%5));
 			        		PutRecordResult putRecordResult = kinesisClient.putRecord(putRecordRequest);
 			        		
 			        		LOG.info(String.format("Seq No: %s - %s", putRecordResult.getSequenceNumber(), tweetText));
 				            tweetIdMap.put(status.getId(), "1");
 				            tweetCount++;
+				            lineNumber++;
 			        	}
 			        }
 			        
