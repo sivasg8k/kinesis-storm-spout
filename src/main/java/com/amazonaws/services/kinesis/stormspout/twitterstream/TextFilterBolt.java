@@ -23,6 +23,7 @@ public class TextFilterBolt extends BaseBasicBolt {
         Long tweetId = new Long(tweetData[0]);
         String tweetText = tweetData[1];
         tweetText = tweetText.replaceAll("[^a-zA-Z\\s]", "").trim().toLowerCase();
+        LOG.info("tweetId----->" + tweetId + "tweetText----->" + tweetText);
         collector.emit(new Values(tweetId,tweetText));
     }
 
