@@ -57,31 +57,31 @@ public class SentimentAnalysisTopology {
         LOGGER.info("Using Kinesis stream: " + config.getStreamName());
 
         // Using number of shards as the parallelism hint for the spout.
-        topology.setSpout("kinesis_spout", spout, 2);
+        topology.setSpout("kinesis_spout", spout, 1);
 
-		topology.setBolt("text_filter", new TextFilterBolt(), 4)
+		topology.setBolt("text_filter", new TextFilterBolt(), 2)
 				.shuffleGrouping("kinesis_spout");
 
-		topology.setBolt("stemming", new StemmingBolt(), 4).shuffleGrouping(
+		topology.setBolt("stemming", new StemmingBolt(), 2).shuffleGrouping(
 				"text_filter");
 
-		topology.setBolt("positive", new PositiveSentimentBolt(), 4)
+		topology.setBolt("positive", new PositiveSentimentBolt(), 2)
 				.shuffleGrouping("stemming");
-		topology.setBolt("negative", new NegativeSentimentBolt(), 4)
+		topology.setBolt("negative", new NegativeSentimentBolt(), 2)
 				.shuffleGrouping("stemming");
 
-		topology.setBolt("join", new JoinSentimentsBolt(), 4)
+		topology.setBolt("join", new JoinSentimentsBolt(), 2)
 				.fieldsGrouping("positive", new Fields("tweet_id"))
 				.fieldsGrouping("negative", new Fields("tweet_id"));
 
-		topology.setBolt("score", new SentimentScoringBolt(), 4)
+		topology.setBolt("score", new SentimentScoringBolt(), 2)
 				.shuffleGrouping("join");
 
 		return topology.createTopology();
 	}
 
 	private static Config createConfig(boolean local) {
-		int workers = 4;
+		int workers = 1;
 		Config conf = new Config();
 		conf.setDebug(true);
 		if (local)
