@@ -108,9 +108,6 @@ public class SentimentAnalysisTopology {
 
 		LocalCluster cluster = new LocalCluster();
 		cluster.submitTopology("sentiment-analysis", createConfig(true),createTopology());
-		Thread.sleep(60000);
-		cluster.shutdown();
-		
 	}
 
 	private static StormTopology createTopology() {
