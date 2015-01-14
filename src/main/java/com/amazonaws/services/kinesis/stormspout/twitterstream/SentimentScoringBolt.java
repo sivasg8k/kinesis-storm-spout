@@ -22,7 +22,7 @@ public class SentimentScoringBolt extends BaseBasicBolt {
         Float pos = tuple.getFloat(tuple.fieldIndex("pos_score"));
         Float neg = tuple.getFloat(tuple.fieldIndex("neg_score"));
         String score = pos > neg ? "positive" : "negative";
-        LOGGER.info(String.format("tweet %s: %s", id, score));
+        LOGGER.info(String.format("tweet id->" + id + " tweetText->" + text + " positive score->" + pos + " negative score->" + neg + " effective sentiment->" + score));
         collector.emit(new Values(id, text, pos, neg, score));
         
     }
