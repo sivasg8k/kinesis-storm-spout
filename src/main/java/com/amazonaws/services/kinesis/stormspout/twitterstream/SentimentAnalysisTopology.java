@@ -144,7 +144,7 @@ public class SentimentAnalysisTopology {
 				.fieldsGrouping("positive", new Fields("tweet_id"))
 				.fieldsGrouping("negative", new Fields("tweet_id"));
 
-		topology.setBolt("score", new SentimentScoringBolt(), 4)
+		topology.setBolt("score", new SentimentScoringBolt(), 2)
 				.shuffleGrouping("join");
 
 		return topology.createTopology();
