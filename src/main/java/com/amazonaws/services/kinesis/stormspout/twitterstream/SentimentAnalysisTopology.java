@@ -126,7 +126,7 @@ public class SentimentAnalysisTopology {
         LOGGER.info("Using Kinesis stream: " + config.getStreamName());
 
         // Using number of shards as the parallelism hint for the spout.
-        topology.setSpout("kinesis_spout", spout, 1);
+        topology.setSpout("kinesis_spout", spout, 1).setDebug(false);
 
 		topology.setBolt("text_filter", new TextFilterBolt(), 2).fieldsGrouping("kinesis_spout", new Fields(SampleKinesisRecordScheme.FIELD_PARTITION_KEY));
 				//.shuffleGrouping("kinesis_spout");
