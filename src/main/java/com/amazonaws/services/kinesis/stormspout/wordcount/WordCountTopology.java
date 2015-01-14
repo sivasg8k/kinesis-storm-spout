@@ -65,7 +65,7 @@ public class WordCountTopology {
                         .withInitialPositionInStream(initialPositionInStream)
                         .withRecordRetryLimit(recordRetryLimit)
                         .withRegion(region);
-
+        
         final KinesisSpout spout = new KinesisSpout(config, new CustomCredentialsProviderChain(), new ClientConfiguration());
         TopologyBuilder builder = new TopologyBuilder();
         LOG.info("Using Kinesis stream: " + config.getStreamName());

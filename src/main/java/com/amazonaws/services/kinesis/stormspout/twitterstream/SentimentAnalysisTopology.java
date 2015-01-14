@@ -128,30 +128,30 @@ public class SentimentAnalysisTopology {
         // Using number of shards as the parallelism hint for the spout.
         topology.setSpout("kinesis_spout", spout, 1).setDebug(false);
 
-		topology.setBolt("text_filter", new TextFilterBolt(), 2).fieldsGrouping("kinesis_spout", new Fields(SampleKinesisRecordScheme.FIELD_PARTITION_KEY)).setDebug(false);
+		topology.setBolt("text_filter", new TextFilterBolt(), 4).fieldsGrouping("kinesis_spout", new Fields(SampleKinesisRecordScheme.FIELD_PARTITION_KEY)).setDebug(false);
 				//.shuffleGrouping("kinesis_spout");
 		
 
-		topology.setBolt("stemming", new StemmingBolt(), 2).shuffleGrouping(
+		topology.setBolt("stemming", new StemmingBolt(), 4).shuffleGrouping(
 				"text_filter");
 
-		topology.setBolt("positive", new PositiveSentimentBolt(), 2)
+		topology.setBolt("positive", new PositiveSentimentBolt(), 4)
 				.shuffleGrouping("stemming");
-		topology.setBolt("negative", new NegativeSentimentBolt(), 2)
+		topology.setBolt("negative", new NegativeSentimentBolt(), 4)
 				.shuffleGrouping("stemming");
 
-		topology.setBolt("join", new JoinSentimentsBolt(), 2)
+		topology.setBolt("join", new JoinSentimentsBolt(), 4)
 				.fieldsGrouping("positive", new Fields("tweet_id"))
 				.fieldsGrouping("negative", new Fields("tweet_id"));
 
-		topology.setBolt("score", new SentimentScoringBolt(), 2)
+		topology.setBolt("score", new SentimentScoringBolt(), 4)
 				.shuffleGrouping("join");
 
 		return topology.createTopology();
 	}
 
 	private static Config createConfig(boolean local) {
-		int workers = 1;
+		int workers = 4;
 		Config conf = new Config();
 		conf.setDebug(false);
 		if (local)
