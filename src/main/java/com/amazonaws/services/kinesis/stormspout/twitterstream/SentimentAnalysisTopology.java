@@ -151,10 +151,10 @@ public class SentimentAnalysisTopology {
 		int workers = 4;
 		Config conf = new Config();
 		conf.setDebug(false);
-		if (local)
+		/*if (local)
 			conf.setMaxTaskParallelism(workers);
 		else
-			conf.setNumWorkers(workers);
+			conf.setNumWorkers(workers);*/
 		conf.setFallBackOnJavaSerialization(true);
         
 		return conf;
